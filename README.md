@@ -40,3 +40,7 @@ bash bash_scripts/cifar-LT-test.sh
 ## Reference Code
 
 [1] SDCLR: https://github.com/VITA-Group/SDCLR
+
+[2] RandAugment: https://github.com/ildoonet/pytorch-randaugment
+
+[3] Linear probing setting in W-MSE: https://github.com/htdt/self-supervised
