@@ -47,7 +47,7 @@ parser.add_argument('--test_10shot', action='store_true')
 parser.add_argument('--test_50shot', action='store_true')
 parser.add_argument('--test_100shot', action='store_true')
 
-parser.add_argument('--momentum_loss_beta', type=float, default=0.9)
+parser.add_argument('--momentum_loss_beta', type=float, default=0.95)
 parser.add_argument('--bcl', action='store_true')
 
 
