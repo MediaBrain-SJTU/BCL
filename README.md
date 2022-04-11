@@ -12,6 +12,7 @@
 - ```./bash_scripts```: bash scripts for running the code.
 - ```./data```: datasets and augmentation.
 - ```./models```: backbone models.
+- ```./split```: imbalanced cifar-100 splits.
 - ```eval_cifar.py```: code for linear probing evaluation.
 - ```train.py```: code for training SimCLR and BCL.
 - ```test.py```: code for testing SimCLR and BCL.
