@@ -35,3 +35,7 @@ To test BCL or SimCLR, please run this command:
 ```test
 bash bash_scripts/cifar-LT-test.sh
 ```
+
+## Reference Code
+
+[1] SDCLR: https://github.com/VITA-Group/SDCLR
