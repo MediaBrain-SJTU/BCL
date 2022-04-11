@@ -48,7 +48,7 @@ bash bash_scripts/cifar-LT-test.sh
 **Steps to Implement Other Datasets**
 
 - Create long-tailed splits of the datasets and add to ./split.
-- Implement the dataset(e.g. CIFAR100_index_bcl in data/cifar100.py).
+- Implement the dataset (e.g. CIFAR100_index_bcl in data/cifar100.py).
 
 ## Reference Code
 
