@@ -1,6 +1,26 @@
-# Boosted-Contrastive-Learning
+## Boosted-Contrastive-Learning
 
-### Train
+## Environment
+- Python (3.7.10)
+- Pytorch (1.7.1)
+- torchvision (0.8.2)
+- CUDA
+- Numpy
+
+## Content
+
+- ```./bash_scripts```: bash scripts for running the code.
+- ```./data```: datasets and augmentation.
+- ```./models```: backbone models.
+- ```eval_cifar.py```: code for linear probing evaluation.
+- ```train.py```: code for training SimCLR and BCL.
+- ```test.py```: code for testing SimCLR and BCL.
+- ```utils.py```: utils(e.g. loss).
+
+## Usage
+
+**Train**
+
 To train BCL, please run this command:
 ```train BCL
 bash bash bash_scripts/cifar-LT-BCL.sh
@@ -10,7 +30,7 @@ To train SimCLR, please run this command:
 bash bash_scripts/cifar-LT-SimCLR.sh
 ```
 
-### Test
+**Test**
 To test BCL or SimCLR, please run this command:
 ```test
 bash bash_scripts/cifar-LT-test.sh
