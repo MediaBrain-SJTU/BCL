@@ -16,7 +16,7 @@
 - ```eval_cifar.py```: code for linear probing evaluation.
 - ```train.py```: code for training SimCLR and BCL.
 - ```test.py```: code for testing SimCLR and BCL.
-- ```utils.py```: utils(e.g. loss).
+- ```utils.py```: utils (e.g. loss).
 
 ## Usage
 
