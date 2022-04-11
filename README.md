@@ -38,6 +38,18 @@ bash bash bash_scripts/cifar-LT-BCL.sh
 bash bash_scripts/cifar-LT-test.sh
 ```
 
+## Extensions
+
+**Steps to Implement Your Own Model**
+
+- Add model to ./models and load model in train.py.
+- Implement functions specfic to your models in train.py.
+
+**Steps to Implement Other Datasets**
+
+- Create long-tailed splits of the datasets and add to ./split.
+- Implement the dataset(e.g. CIFAR100_index_bcl in data/cifar100.py).
+
 ## Reference Code
 
 [1] SDCLR: https://github.com/VITA-Group/SDCLR
