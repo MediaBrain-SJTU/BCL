@@ -50,10 +50,3 @@ bash bash_scripts/cifar-LT-test.sh
 - Create long-tailed splits of the datasets and add to ./split.
 - Implement the dataset (e.g. CIFAR100_index_bcl in data/cifar100.py).
 
-## Reference Code
-
-[1] SDCLR: https://github.com/VITA-Group/SDCLR
-
-[2] RandAugment: https://github.com/ildoonet/pytorch-randaugment
-
-[3] Linear probing setting in W-MSE: https://github.com/htdt/self-supervised
