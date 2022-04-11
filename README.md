@@ -11,6 +11,7 @@ bash bash_scripts/cifar-LT-SimCLR.sh
 ```
 
 ### Test
+To test BCL or SimCLR, please run this command:
 ```test
 bash bash_scripts/cifar-LT-test.sh
 ```
