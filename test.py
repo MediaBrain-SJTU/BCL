@@ -16,7 +16,6 @@ import torchvision
 from data.cifar100 import CustomCIFAR100, CIFAR100_index
 from data.augmentation import GaussianBlur
 from eval_cifar import eval
-from sklearn.cluster import KMeans
 
 
 parser = argparse.ArgumentParser(description='PyTorch Cifar10 Training')
