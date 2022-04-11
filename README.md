@@ -42,7 +42,7 @@ bash bash_scripts/cifar-LT-test.sh
 
 **Steps to Implement Your Own Model**
 
-- Add model to ./models and load model in train.py.
+- Add your model to ./models and load the model in train.py.
 - Implement functions specfic to your models in train.py.
 
 **Steps to Implement Other Datasets**
