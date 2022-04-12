@@ -18,7 +18,7 @@ from data.augmentation import GaussianBlur
 from eval_cifar import eval
 
 
-parser = argparse.ArgumentParser(description='PyTorch Cifar10 Training')
+parser = argparse.ArgumentParser(description='PyTorch Cifar100 Testing')
 parser.add_argument('experiment', type=str)
 parser.add_argument('--save-dir', default='', type=str, help='path to save checkpoint')
 parser.add_argument('--data_folder', default='', type=str, help='dataset path')
