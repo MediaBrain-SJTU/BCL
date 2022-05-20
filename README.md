@@ -3,7 +3,7 @@
 This repo provides a demo for the ICML 2022 paper "Contrastive Learning with Boosted Memorization" on the CIFAR-100-LT dataset. 
 
 <div align="left">
-  <img src="figures/methods.pdf" width="500px" />
+  <img src="figures/methods.jpg" width="500px" />
 </div>
 
 ## Quick Preview
