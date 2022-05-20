@@ -1,7 +1,5 @@
-import time
 import torch
 from torch import nn
-from utils import AverageMeter
 import numpy as np
 import torch.optim as optim
 
@@ -50,8 +48,8 @@ def eval(train_loader, test_loader, model, epoch, args=None):
     
     model.eval()
     
-    fc = model.module.fc
-    model.module.fc = nn.Identity()
+    projector = model.projector
+    model.projector = nn.Identity()
 
     with torch.no_grad():
 
@@ -86,6 +84,6 @@ def eval(train_loader, test_loader, model, epoch, args=None):
 
     acc = eval_sgd(x_train, y_train, x_test, y_test)
 
-    model.module.fc = fc
+    model.projector = projector
 
     return acc
