@@ -9,8 +9,10 @@ import numpy as np
 import torchvision
 from data.cifar100 import *
 from eval_cifar import eval
-from models.simclr import SimCLR
 from data.memoboosted_cifar100 import memoboosted_CIFAR100
+from data.augmentations import cifar_tfs_train, cifar_tfs_test
+from models.simclr import SimCLR
+from losses.nt_xent import NT_xent_Loss
 
 parser = argparse.ArgumentParser(description='PyTorch Cifar100LT Self-supervised Training')
 parser.add_argument('experiment', type=str)
@@ -59,11 +61,14 @@ def main():
     log = logger(path=save_dir, log_name=logName)
     log.info(str(args))
 
-    # model
+    # create model
     model = SimCLR(num_class=args.num_class, network=args.model).cuda()
+
+    # loss
+    criterion = NT_xent_Loss(temp=args.temperature, average=False)
  
     # data aug
-    tfs_train, tfs_test = cifar_aug()
+    tfs_train, tfs_test = cifar_tfs_train, cifar_tfs_test
 
     # train loader
     train_idx = np.load('split/{}'.format(args.trainSplit))
@@ -76,18 +81,12 @@ def main():
                                                batch_size=args.batch_size, shuffle=True, pin_memory=True)
     # dataset statistics
     class_stat = train_datasets.idxsNumPerClass
-    log.info("class distribution in training set is {}".format(class_stat))
     dataset_total_num = np.sum(class_stat)
-    log.info("total sample number in training set is {}".format(dataset_total_num))
+    log.info("class distribution in training set is {}".format(class_stat))
 
     # eval loader
     eval_train_datasets = torchvision.datasets.CIFAR100(root=args.data_folder, train=True, download=True, transform=tfs_test)
     eval_train_loader_fullshot = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100/cifar100_trainIdxList.npy'))), num_workers=2)
-    eval_train_loader_100shot_1 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split1_test_100shot.npy'))), num_workers=2)
-    eval_train_loader_100shot_2 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split2_test_100shot.npy'))), num_workers=2)
-    eval_train_loader_100shot_3 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split3_test_100shot.npy'))), num_workers=2)
-    eval_train_loader_100shot_4 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split4_test_100shot.npy'))), num_workers=2)
-    eval_train_loader_100shot_5 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split5_test_100shot.npy'))), num_workers=2)
 
     eval_testset = torchvision.datasets.CIFAR100(root=args.data_folder, train=False, download=True, transform=tfs_test)
     eval_test_loader = torch.utils.data.DataLoader(eval_testset, batch_size=1000, shuffle=False, num_workers=1, pin_memory=True)
@@ -95,7 +94,8 @@ def main():
     # setting training schedule
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, momentum=0.9)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda step: cosine_annealing(step, args.epochs * len(train_loader), 1, 1e-6 / args.lr, warmup_steps=10 * len(train_loader)))
-            
+
+    # optionally resume from a checkpoint 
     if args.resume:
         if args.checkpoint == '':
             checkpoint = torch.load(os.path.join(save_dir, 'model.pt'), map_location="cuda")
@@ -114,7 +114,7 @@ def main():
     for epoch in range(1, args.epochs + 1):
         log.info("current lr is {}".format(optimizer.state_dict()['param_groups'][0]['lr']))
 
-        shadow, momentum_loss = train(train_loader, model, optimizer, scheduler, epoch, log, shadow, momentum_loss, args=args)
+        shadow, momentum_loss = train(train_loader, model, criterion, optimizer, scheduler, epoch, log, shadow, momentum_loss, args=args)
         if args.bcl:
             train_datasets.update_momentum_weight(momentum_loss, epoch)
      
@@ -122,14 +122,6 @@ def main():
             # linear probing on full dataset 
             acc_full = eval(eval_train_loader_fullshot, eval_test_loader, model, epoch, args=args)
             log.info("Accuracy fullshot {}".format(acc_full))
-            # linear probing on 100-shot dataset
-            acc_few_1 = eval(eval_train_loader_100shot_1, eval_test_loader, model, epoch, args=args)
-            acc_few_2 = eval(eval_train_loader_100shot_2, eval_test_loader, model, epoch, args=args)
-            acc_few_3 = eval(eval_train_loader_100shot_3, eval_test_loader, model, epoch, args=args)
-            acc_few_4 = eval(eval_train_loader_100shot_4, eval_test_loader, model, epoch, args=args)
-            acc_few_5 = eval(eval_train_loader_100shot_5, eval_test_loader, model, epoch, args=args)
-            acc_average = (acc_few_1[1]+acc_few_2[1]+acc_few_3[1]+acc_few_4[1]+acc_few_5[1])/5
-            log.info("Accuracy 100shot {},{},{},{},{}, Average {}".format(acc_few_1, acc_few_2, acc_few_3, acc_few_4, acc_few_5, acc_average))
 
         if epoch % 2 == 0:
             save_checkpoint({'epoch': epoch,'state_dict': model.state_dict(),'optim': optimizer.state_dict(),}, filename=os.path.join(save_dir, 'model.pt'))
@@ -137,7 +129,7 @@ def main():
             save_checkpoint({'epoch': epoch,'state_dict': model.state_dict(),'optim': optimizer.state_dict(),}, filename=os.path.join(save_dir, 'model_{}.pt'.format(epoch)))
     
 
-def train(train_loader, model, optimizer, scheduler, epoch, log, shadow=None, momentum_loss=None, args=None):
+def train(train_loader, model, criterion, optimizer, scheduler, epoch, log, shadow=None, momentum_loss=None, args=None):
     losses, data_time_meter, train_time_meter = AverageMeter(), AverageMeter(), AverageMeter()
     losses.reset()
     end = time.time()
@@ -154,7 +146,7 @@ def train(train_loader, model, optimizer, scheduler, epoch, log, shadow=None, mo
         inputs = inputs.view(d[0]*2, d[2], d[3], d[4]).cuda(non_blocking=True)
 
         features = model(inputs)
-        loss = nt_xent(features, t=args.temperature, average=False)
+        loss = criterion(features)
 
         for count in range(batch_size):
             if epoch>1:

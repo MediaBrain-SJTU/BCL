@@ -29,64 +29,6 @@ class NormalizeByChannelMeanStd(nn.Module):
         return 'mean={}, std={}'.format(self.mean, self.std)
 
 
-class proj_head(nn.Module):
-    def __init__(self, ch, output_cnt=None, finetuneMode=False):
-        super(proj_head, self).__init__()
-        self.in_features = ch
-        self.finetuneMode = finetuneMode
-
-        if output_cnt is None:
-            output_cnt = ch
-
-        self.fc1 = nn.Linear(ch, ch)
-        self.bn1 = nn.BatchNorm1d(ch)
-
-        if not self.finetuneMode:
-            self.fc2 = nn.Linear(ch, output_cnt, bias=False)
-            self.bn2 = nn.BatchNorm1d(output_cnt)
-
-        self.relu = nn.ReLU(inplace=True)
-
-    def forward(self, x):
-
-        x = self.fc1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-
-        if not self.finetuneMode:
-            x = self.fc2(x)
-            x = self.bn2(x)
-
-        return x
-
-
-class proj_regression_head(nn.Module):
-    def __init__(self, ch, output_cnt=None, finetuneMode=False):
-        super(proj_regression_head, self).__init__()
-        self.in_features = ch
-        self.finetuneMode = finetuneMode
-
-        if output_cnt is None:
-            output_cnt = ch
-
-        self.fc1 = nn.Linear(ch, ch)
-        self.bn1 = nn.BatchNorm1d(ch)
-
-        self.relu = nn.ReLU(inplace=True)
-
-        self.fc2 = nn.Linear(ch, output_cnt, bias=False)
-        self.bn2 = nn.BatchNorm1d(output_cnt)  
-
-    def forward(self, x):
-
-        x = self.fc1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        
-        x = self.fc2(x)
-        x = self.bn2(x)
-
-        return x
 
 
 
