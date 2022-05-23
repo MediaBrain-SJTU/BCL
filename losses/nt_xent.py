@@ -48,9 +48,9 @@ def nt_xent(x, t=0.5, features2=None, average=True):
     else: 
         return loss_reshape
 
-class NT_xent_Loss(nn.Module):
+class NT_Xent_Loss(nn.Module):
     def __init__(self, temp=0.2, average=True):
-        super(NT_xent_Loss, self).__init__()
+        super(NT_Xent_Loss, self).__init__()
         self.temp = temp
         self.average = average
 

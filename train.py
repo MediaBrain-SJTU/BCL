@@ -1,18 +1,18 @@
 import argparse
 import os
+import numpy as np
 import torch
 import torch.optim
 import torch.utils.data
+import torchvision
 from torch.utils.data.sampler import SubsetRandomSampler
 from utils import *
-import numpy as np
-import torchvision
-from data.cifar100 import *
 from eval_cifar import eval
+from data.cifar100 import CIFAR100_index
 from data.memoboosted_cifar100 import memoboosted_CIFAR100
 from data.augmentations import cifar_tfs_train, cifar_tfs_test
 from models.simclr import SimCLR
-from losses.nt_xent import NT_xent_Loss
+from losses.nt_xent import NT_Xent_Loss
 
 parser = argparse.ArgumentParser(description='PyTorch Cifar100LT Self-supervised Training')
 parser.add_argument('experiment', type=str)
@@ -56,7 +56,7 @@ def main():
     torch.backends.cudnn.benchmark = True
     setup_seed(args.seed)
     
-    # create log
+    # init log
     logName = "log.txt"
     log = logger(path=save_dir, log_name=logName)
     log.info(str(args))
@@ -65,33 +65,30 @@ def main():
     model = SimCLR(num_class=args.num_class, network=args.model).cuda()
 
     # loss
-    criterion = NT_xent_Loss(temp=args.temperature, average=False)
+    criterion = NT_Xent_Loss(temp=args.temperature, average=False)
  
     # data aug
     tfs_train, tfs_test = cifar_tfs_train, cifar_tfs_test
 
-    # train loader
-    train_idx = np.load('split/{}'.format(args.trainSplit))
-    train_idx_list = list(train_idx)
+    # loading data
+    train_idx_list = list(np.load('split/{}'.format(args.trainSplit)))
     if args.bcl:
         train_datasets = memoboosted_CIFAR100(train_idx_list, args, root=args.data_folder, train=True)
     else:
         train_datasets = CIFAR100_index(train_idx_list, root=args.data_folder, train=True, transform=tfs_train, download=True)
-    train_loader = torch.utils.data.DataLoader(train_datasets, num_workers=args.num_workers,
-                                               batch_size=args.batch_size, shuffle=True, pin_memory=True)
+    eval_train_datasets = torchvision.datasets.CIFAR100(root=args.data_folder, train=True, download=True, transform=tfs_test)
+    eval_test_datasets = torchvision.datasets.CIFAR100(root=args.data_folder, train=False, download=True, transform=tfs_test)
+
+    train_loader = torch.utils.data.DataLoader(train_datasets, num_workers=args.num_workers, batch_size=args.batch_size, shuffle=True, pin_memory=True)
+    eval_train_loader = torch.utils.data.DataLoader(eval_train_datasets, batch_size=1000, num_workers=args.num_workers, sampler=SubsetRandomSampler(list(np.load('split/cifar100/cifar100_trainIdxList.npy'))))
+    eval_test_loader = torch.utils.data.DataLoader(eval_test_datasets, batch_size=1000, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+
     # dataset statistics
     class_stat = train_datasets.idxsNumPerClass
     dataset_total_num = np.sum(class_stat)
     log.info("class distribution in training set is {}".format(class_stat))
 
-    # eval loader
-    eval_train_datasets = torchvision.datasets.CIFAR100(root=args.data_folder, train=True, download=True, transform=tfs_test)
-    eval_train_loader_fullshot = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100/cifar100_trainIdxList.npy'))), num_workers=2)
-
-    eval_testset = torchvision.datasets.CIFAR100(root=args.data_folder, train=False, download=True, transform=tfs_test)
-    eval_test_loader = torch.utils.data.DataLoader(eval_testset, batch_size=1000, shuffle=False, num_workers=1, pin_memory=True)
-    
-    # setting training schedule
+    # training schedule
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, momentum=0.9)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda step: cosine_annealing(step, args.epochs * len(train_loader), 1, 1e-6 / args.lr, warmup_steps=10 * len(train_loader)))
 
@@ -120,7 +117,7 @@ def main():
      
         if (epoch+1) % args.eval_freq == 0 or epoch==0:
             # linear probing on full dataset 
-            acc_full = eval(eval_train_loader_fullshot, eval_test_loader, model, epoch, args=args)
+            acc_full = eval(eval_train_loader, eval_test_loader, model, epoch, args=args)
             log.info("Accuracy fullshot {}".format(acc_full))
 
         if epoch % 2 == 0:
