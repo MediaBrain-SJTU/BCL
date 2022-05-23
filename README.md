@@ -47,7 +47,6 @@ momentum_loss[epoch-1,index[batch_idx]] = new_average
 
 ### Content
 
-- ```./bash_scripts```: bash scripts for running the code.
 - ```./data```: datasets and augmentation.
 - ```./models```: backbone models.
 - ```./split```: imbalanced cifar-100 splits.
@@ -62,18 +61,18 @@ momentum_loss[epoch-1,index[batch_idx]] = new_average
 
 - SimCLR
 ```train SimCLR
-bash bash_scripts/cifar-LT-SimCLR.sh
+python train.py simclr --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy --save-dir checkpoints
 ```
 
 - BCL
 ```train BCL
-bash bash bash_scripts/cifar-LT-BCL.sh
+python train.py simclr --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy --save-dir checkpoints --bcl
 ```
 
 **Test**
 
 ```test
-bash bash_scripts/cifar-LT-test.sh
+python test.py --checkpoint ${checkpoint_pretrain} --test_fullshot --test_100shot --test_50shot --test_10shot
 ```
 
 ### Extensions
