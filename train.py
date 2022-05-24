@@ -138,14 +138,10 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, log, shad
         scheduler.step()
         model.train()
 
-        d = inputs.size()
-        batch_size = d[0]
-        inputs = inputs.view(d[0]*2, d[2], d[3], d[4]).cuda(non_blocking=True)
-
         features = model(inputs)
         loss = criterion(features)
 
-        for count in range(batch_size):
+        for count in range(inputs.size()[0]):
             if epoch>1:
                 new_average = (1.0 - args.momentum_loss_beta) * loss[count].clone().detach() + args.momentum_loss_beta * shadow[index[count]]
             else:

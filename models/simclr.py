@@ -2,20 +2,18 @@ import torch.nn as nn
 from models.resnet import resnet18, resnet50
 
 class proj_head(nn.Module):
-    def __init__(self, ch, output_cnt=None, finetuneMode=False):
+    def __init__(self, ch, output_cnt=None):
         super(proj_head, self).__init__()
         self.in_features = ch
-        self.finetuneMode = finetuneMode
 
         if output_cnt is None:
             output_cnt = ch
 
         self.fc1 = nn.Linear(ch, ch)
         self.bn1 = nn.BatchNorm1d(ch)
-
-        if not self.finetuneMode:
-            self.fc2 = nn.Linear(ch, output_cnt, bias=False)
-            self.bn2 = nn.BatchNorm1d(output_cnt)
+      
+        self.fc2 = nn.Linear(ch, output_cnt, bias=False)
+        self.bn2 = nn.BatchNorm1d(output_cnt)
 
         self.relu = nn.ReLU(inplace=True)
 
@@ -25,9 +23,8 @@ class proj_head(nn.Module):
         x = self.bn1(x)
         x = self.relu(x)
 
-        if not self.finetuneMode:
-            x = self.fc2(x)
-            x = self.bn2(x)
+        x = self.fc2(x)
+        x = self.bn2(x)
 
         return x
 
@@ -46,6 +43,9 @@ class SimCLR(nn.Module):
                 'resnet50': resnet50}[backbone_name]
 
     def forward(self, x):
+
+        d = x.size()
+        x = x.view(d[0]*2, d[2], d[3], d[4]).cuda(non_blocking=True)
         
         x = self.backbone(x)
         x = self.projector(x)
