@@ -61,12 +61,12 @@ momentum_loss[epoch-1,index[batch_idx]] = new_average
 
 - SimCLR
 ```train SimCLR
-python train.py simclr --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy --save-dir checkpoints
+python train.py simclr --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 - BCL
 ```train BCL
-python train.py simclr --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy --save-dir checkpoints 
+python train.py simclr --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 **Test**

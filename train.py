@@ -16,10 +16,10 @@ from losses.nt_xent import NT_Xent_Loss
 
 parser = argparse.ArgumentParser(description='PyTorch Cifar100LT Self-supervised Training')
 parser.add_argument('experiment', type=str)
-parser.add_argument('--save-dir', default='', type=str, help='path to save checkpoint')
+parser.add_argument('--save-dir', default='checkpoints', type=str, help='path to save checkpoint')
 parser.add_argument('--data_folder', default='', type=str, help='dataset path')
 parser.add_argument('--dataset', type=str, default='cifar100', help="dataset-cifar100")
-parser.add_argument('--trainSplit', type=str, default='trainIdxList.npy', help="train split")
+parser.add_argument('--trainSplit', type=str, default='', help="train split")
 parser.add_argument("--gpus", type=str, default="0", help="gpu id sequence split by comma")
 parser.add_argument('--seed', type=int, default=10, help='random seed')
 parser.add_argument('--num_workers', type=int, default=8, help='num workers')
@@ -57,19 +57,21 @@ def main():
     setup_seed(args.seed)
     
     # init log
-    logName = "log.txt"
-    log = logger(path=save_dir, log_name=logName)
+    log = logger(path=save_dir, log_name="log.txt")
     log.info(str(args))
 
     # create model
     model = SimCLR(num_class=args.num_class, network=args.model).cuda()
 
-    # loss
+    # criterion
     criterion = NT_Xent_Loss(temp=args.temperature, average=False)
- 
-    # data aug
-    tfs_train, tfs_test = cifar_tfs_train, cifar_tfs_test
 
+    # optimizer, training schedule
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, momentum=0.9)
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda step: cosine_annealing(step, args.epochs * len(train_loader), 1, 1e-6 / args.lr, warmup_steps=10 * len(train_loader)))
+
+    # data augmentations
+    tfs_train, tfs_test = cifar_tfs_train, cifar_tfs_test
     # loading data
     train_idx_list = list(np.load('split/{}'.format(args.trainSplit)))
     if args.bcl:
@@ -87,10 +89,6 @@ def main():
     class_stat = train_datasets.idxsNumPerClass
     dataset_total_num = np.sum(class_stat)
     log.info("class distribution in training set is {}".format(class_stat))
-
-    # training schedule
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, momentum=0.9)
-    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda step: cosine_annealing(step, args.epochs * len(train_loader), 1, 1e-6 / args.lr, warmup_steps=10 * len(train_loader)))
 
     # optionally resume from a checkpoint 
     if args.resume:
@@ -169,12 +167,6 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, log, shad
                           data_time=data_time_meter, train_time=train_time_meter))
         
     return shadow, momentum_loss
-
-def save_checkpoint(state, filename='weight.pt'):
-    """
-    Save the training model
-    """
-    torch.save(state, filename)
 
 
 if __name__ == '__main__':

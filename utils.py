@@ -47,7 +47,6 @@ class logger(object):
             with open(os.path.join(self.path, self.log_name), 'a') as f:
                 f.write(msg + "\n")
 
-
 def cosine_annealing(step, total_steps, lr_max, lr_min, warmup_steps=0):
     assert warmup_steps >= 0
 
@@ -58,4 +57,9 @@ def cosine_annealing(step, total_steps, lr_max, lr_min, warmup_steps=0):
 
     return lr
 
+def save_checkpoint(state, filename='weight.pt'):
+    """
+    Save the training model
+    """
+    torch.save(state, filename)
 
