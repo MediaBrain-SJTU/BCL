@@ -1,10 +1,18 @@
-## Boosted-Contrastive-Learning
+# Contrastive Learning with Boosted Memorization
 
-This repo provides a demo for the ICML 2022 paper "Contrastive Learning with Boosted Memorization" on the CIFAR-100-LT dataset. 
+**Official PyTorch code** for the paper "Contrastive Learning with Boosted Memorization".
+
+**[Contrastive Learning with Boosted Memorization](https://arxiv.org/abs/2205.12693)**  
+Zhihan Zhou, Jiangchao Yao, Yanfeng Wang, Bo Han, Ya Zhang
+
+arXiv 2022
 
 <div align="left">
   <img src="figures/methods.jpg" width="1000px" />
 </div>
+
+**Abstract**: Self-supervised learning has achieved a great success in the representation learning of visual and textual data. However, the current methods are mainly validated on the well-curated datasets, which do not exhibit the real-world long-tailed distribution. Recent attempts to consider self-supervised long-tailed learning are made by rebalancing in the loss perspective or the model perspective, resembling the paradigms in the supervised long-tailed learning. Nevertheless, without the aid of labels, these explorations have not shown the expected significant promise due to the limitation in tail sample discovery or the heuristic structure design. Different from previous works, we explore this direction from an alternative perspective, i.e., the data perspective, and propose a novel Boosted Contrastive Learning (BCL) method. Specifically, BCL leverages the memorization effect of deep neural networks to automatically drive the information discrepancy of the sample views in contrastive learning, which is more efficient to enhance the long-tailed learning in the label-unaware context. Extensive experiments on a range of benchmark datasets demonstrate the effectiveness of BCL over several state-of-the-art methods.
+
 
 ## Quick Preview
 A code snippet of the BCL is shown below. 
@@ -36,7 +44,7 @@ momentum_loss[epoch-1,index[batch_idx]] = new_average
 
 ```
 
-## Implementation Details
+## Get Started
 
 ### Environment
 - Python (3.7.10)
@@ -45,15 +53,32 @@ momentum_loss[epoch-1,index[batch_idx]] = new_average
 - CUDA
 - Numpy
 
-### Content
+### File Structure
 
-- ```./data```: datasets and augmentation.
-- ```./models```: backbone models.
-- ```./split```: imbalanced cifar-100 splits.
-- ```eval_cifar.py```: code for linear probing evaluation.
-- ```train.py```: code for training SimCLR and BCL.
-- ```test.py```: code for testing SimCLR and BCL.
-- ```utils.py```: utils (e.g. loss).
+After the prepartion work, the whole project should has the following structure:
+
+```
+./Boosted-Contrastive-Learning
+├── README.md
+├── data                            # datasets and augmentations
+│   ├── memoboosted_cifar100.py
+│   ├── cifar100.py                   
+│   ├── augmentations.py
+│   └── randaug.py
+├── models                          # models and backbones
+│   ├── simclr.py
+│   ├── resnet.py
+│   └── utils.py
+├── losses                          # losses
+│   └── nt_xent.py   
+├── split                           # data split
+│   ├── cifar100                        
+│   └── cifar100_imbSub_with_subsets
+├── eval_cifar.py                   # linear probing evaluation code
+├── test.py                         # testing code
+├── train.py                        # training code
+└── utils.py                        # utils
+```
 
 ### Usage
 
@@ -80,10 +105,28 @@ python test.py --checkpoint ${checkpoint_pretrain} --test_fullshot --test_100sho
 **Steps to Implement Your Own Model**
 
 - Add your model to ./models and load the model in train.py.
-- Implement functions specfic to your models in train.py.
+- Implement functions(./losses) specfic to your models in train.py.
 
 **Steps to Implement Other Datasets**
 
 - Create long-tailed splits of the datasets and add to ./split.
 - Implement the dataset (e.g. memoboosted_cifar100.py).
 
+
+## Citation
+
+If you find our paper and repo useful, please cite as
+
+```
+@article{
+    zhou2022boostedmemo,
+    title={Contrastive Learning with Boosted Memorization},
+    author={Zhihan Zhou and Jiangchao Yao and Yanfeng Wang and Bo Han and Ya Zhang},
+    journal={arXiv:2205.12693},
+    year={2022},
+}
+```
+
+## Acknowledgement
+
+Code from [SDCLR](https://github.com/VITA-Group/SDCLR), [RandAugment](https://github.com/ildoonet/pytorch-randaugment) and [W-MSE](https://github.com/htdt/self-supervised)

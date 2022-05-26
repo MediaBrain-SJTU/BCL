@@ -36,7 +36,7 @@ parser.add_argument('--lr', default=0.5, type=float, help='optimizer lr')
 parser.add_argument('--weight_decay', default=5e-4, type=float)
 parser.add_argument('--temperature', default=0.2, type=float, help='nt_xent temperature')
 parser.add_argument('--bcl', action='store_true', help='boosted contrastive learning')
-parser.add_argument('--momentum_loss_beta', type=float, default=0.95)
+parser.add_argument('--momentum_loss_beta', type=float, default=0.97)
 parser.add_argument('--rand_k', type=int, default=1, help='k in randaugment')
 parser.add_argument('--rand_strength', type=int, default=30, help='maximum strength in randaugment(0-30)')
 
