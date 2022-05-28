@@ -55,7 +55,7 @@ momentum_loss[epoch-1,index[batch_idx]] = new_average
 
 ### File Structure
 
-After the prepartion work, the whole project should has the following structure:
+After the preparation work, the whole project should has the following structure:
 
 ```
 ./Boosted-Contrastive-Learning
@@ -67,7 +67,9 @@ After the prepartion work, the whole project should has the following structure:
 │   └── randaug.py
 ├── models                          # models and backbones
 │   ├── simclr.py
+│   ├── sdclr.py
 │   ├── resnet.py
+│   ├── resnet_prune_multibn.py
 │   └── utils.py
 ├── losses                          # losses
 │   └── nt_xent.py   
@@ -77,6 +79,7 @@ After the prepartion work, the whole project should has the following structure:
 ├── eval_cifar.py                   # linear probing evaluation code
 ├── test.py                         # testing code
 ├── train.py                        # training code
+├── train_sdclr.py                  # training code for sdclr
 └── utils.py                        # utils
 ```
 
@@ -89,9 +92,19 @@ After the prepartion work, the whole project should has the following structure:
 python train.py simclr --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
-- BCL
-```train BCL
-python train.py simclr --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
+- BCL-I
+```train BCL-I
+python train.py bcl_i --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
+```
+
+- SDCLR
+```train SimCLR
+python train_prune.py sdclr --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
+```
+
+- BCL-D
+```train BCL-D
+python train_prune.py bcl_d --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 **Test**

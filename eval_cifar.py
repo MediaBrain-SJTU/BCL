@@ -48,8 +48,12 @@ def eval(train_loader, test_loader, model, epoch, args=None):
     
     model.eval()
     
-    projector = model.projector
-    model.projector = nn.Identity()
+    if args.prune_percent > 0:
+        projector = model.backbone.fc
+        model.backbone.fc = nn.Identity()
+    else:
+        projector = model.projector
+        model.projector = nn.Identity()
 
     with torch.no_grad():
 
@@ -84,6 +88,9 @@ def eval(train_loader, test_loader, model, epoch, args=None):
 
     acc = eval_sgd(x_train, y_train, x_test, y_test)
 
-    model.projector = projector
+    if args.prune_percent > 0:
+        model.backbone.fc = projector
+    else:
+        model.projector = projector
 
     return acc

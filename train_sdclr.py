@@ -11,7 +11,7 @@ from eval_cifar import eval
 from data.cifar100 import CIFAR100_index
 from data.memoboosted_cifar100 import memoboosted_CIFAR100
 from data.augmentations import cifar_tfs_train, cifar_tfs_test
-from models.simclr import SimCLR
+from models.sdclr import SDCLR, Mask
 from losses.nt_xent import NT_Xent_Loss
 
 parser = argparse.ArgumentParser(description='PyTorch Cifar100-LT Self-supervised Training')
@@ -39,6 +39,8 @@ parser.add_argument('--bcl', action='store_true', help='boosted contrastive lear
 parser.add_argument('--momentum_loss_beta', type=float, default=0.97)
 parser.add_argument('--rand_k', type=int, default=1, help='k in randaugment')
 parser.add_argument('--rand_strength', type=int, default=30, help='maximum strength in randaugment(0-30)')
+parser.add_argument('--prune_percent', type=float, default=0.9, help="whole prune percentage")
+parser.add_argument('--random_prune_percent', type=float, default=0, help="random prune percentage")
 
 
 def main():
@@ -61,7 +63,7 @@ def main():
     log.info(str(args))
 
     # create model
-    model = SimCLR(num_class=args.num_class, network=args.model).cuda()
+    model = SDCLR(num_class=args.num_class, network=args.model).cuda()
 
     # criterion
     criterion = NT_Xent_Loss(temp=args.temperature, average=False)
@@ -109,7 +111,7 @@ def main():
     for epoch in range(1, args.epochs + 1):
         log.info("current lr is {}".format(optimizer.state_dict()['param_groups'][0]['lr']))
 
-        shadow, momentum_loss = train(train_loader, model, criterion, optimizer, scheduler, epoch, log, shadow, momentum_loss, args=args)
+        shadow, momentum_loss = train_prune(train_loader, model, criterion, optimizer, scheduler, epoch, log, shadow, momentum_loss, args=args)
         if args.bcl:
             train_datasets.update_momentum_weight(momentum_loss, epoch)
      
@@ -124,20 +126,46 @@ def main():
             save_checkpoint({'epoch': epoch,'state_dict': model.state_dict(),'optim': optimizer.state_dict(),}, filename=os.path.join(save_dir, 'model_{}.pt'.format(epoch)))
     
 
-def train(train_loader, model, criterion, optimizer, scheduler, epoch, log, shadow=None, momentum_loss=None, args=None):
+def train_prune(train_loader, model, criterion, optimizer, scheduler, epoch, log, shadow=None, momentum_loss=None, args=None):
+
+    pruneMask = Mask(model)
+    prunePercent = args.prune_percent
+    randomPrunePercent = args.random_prune_percent
+    magnitudePrunePercent = prunePercent - randomPrunePercent
+
+    log.info("current prune percent is {}".format(prunePercent))
+    if randomPrunePercent > 0:
+        log.info("random prune percent is {}".format(randomPrunePercent))
+
     losses, data_time_meter, train_time_meter = AverageMeter(), AverageMeter(), AverageMeter()
     losses.reset()
     end = time.time()
+
+    # prune every epoch
+    pruneMask.magnitudePruning(magnitudePrunePercent, randomPrunePercent)
 
     for i, (inputs, index) in enumerate(train_loader):
         data_time = time.time() - end
         data_time_meter.update(data_time)
 
         scheduler.step()
-        model.train()
 
-        features = model(inputs)
-        loss = criterion(features)
+        inputs = inputs.cuda(non_blocking=True)
+        inputs_1 = inputs[:, 0, ...]
+        inputs_2 = inputs[:, 1, ...]
+
+        model.train()
+        optimizer.zero_grad()
+
+        # calculate the grad for non-pruned network
+        with torch.no_grad():
+            # branch with pruned network
+            model.backbone.set_prune_flag(True)
+            features_2_noGrad = model(inputs_2).detach()
+        model.backbone.set_prune_flag(False)
+        features_1 = model(inputs_1)
+
+        loss = criterion(features_1, features_=features_2_noGrad)
 
         for count in range(inputs.size()[0]):
             if epoch>1:
@@ -148,11 +176,18 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, log, shad
             shadow[index[count]] = new_average
             momentum_loss[epoch-1,index[count]] = new_average
 
-        optimizer.zero_grad()
         loss.mean().backward()
-        optimizer.step()
-
         losses.update(float(loss.mean().detach().cpu()), inputs.shape[0])
+
+        # calculate the grad for pruned network
+        features_1_no_grad = features_1.detach()
+        model.backbone.set_prune_flag(True)
+        features_2 = model(inputs_2)
+
+        loss = criterion(features_1_no_grad, features_=features_2)
+        loss.mean().backward()
+
+        optimizer.step()
 
         train_time = time.time() - end
         end = time.time()
