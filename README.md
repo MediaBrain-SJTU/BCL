@@ -99,12 +99,12 @@ python train.py bcl_i --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_de
 
 - SDCLR
 ```train SimCLR
-python train_prune.py sdclr --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
+python train_sdclr.py sdclr --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 - BCL-D
 ```train BCL-D
-python train_prune.py bcl_d --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
+python train_sdclr.py bcl_d --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 **Test**
