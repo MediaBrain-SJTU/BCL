@@ -94,7 +94,7 @@ python train.py SimCLR --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5
 
 - BCL-I
 ```train BCL-I
-python train.py BCL_I --BCL --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --data_folder ${data_folder} --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
+python train.py BCL_I --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --data_folder ${data_folder} --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 - SDCLR
@@ -107,19 +107,23 @@ python train_sdclr.py SDCLR --lr 0.5 --epochs 2000 --temperature 0.2 --weight_de
 python train_sdclr.py BCL_D --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --data_folder ${data_folder} --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
+Pretrained checkpoints will be saved in 'checkpoints/'.
+
 ### Evaluating
 
 To evalutate the pretrained model, simply run:
 
 - SimCLR, BCL-I
 ```test SimCLR, BCL-I
-python test.py --checkpoint ${checkpoint_pretrain} --test_fullshot --test_100shot --test_50shot --test_10shot --data_folder ${data_folder}
+python test.py --checkpoint ${checkpoint_pretrain} --test_fullshot --test_100shot --test_50shot --data_folder ${data_folder}
 ```
 
 - SDCLR, BCL-D
 ```test SDCLR, BCL-D
-python test.py --checkpoint ${checkpoint_pretrain} --prune --test_fullshot --test_100shot --test_50shot --test_10shot --data_folder ${data_folder}
+python test.py --checkpoint ${checkpoint_pretrain} --prune --test_fullshot --test_100shot --test_50shot --data_folder ${data_folder}
 ```
+
+The code will output the results of full-shot/100-shot/50-shot linear probing evaluation.
 
 ### Extensions
 

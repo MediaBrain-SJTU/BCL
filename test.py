@@ -21,9 +21,8 @@ parser.add_argument('--checkpoint', default='', type=str, help='saving pretraine
 parser.add_argument('--seed', type=int, default=10, help='random seed')
 parser.add_argument('--model', default='resnet18', type=str, help='model type')
 parser.add_argument('--test_fullshot', action='store_true')
-parser.add_argument('--test_10shot', action='store_true')
-parser.add_argument('--test_50shot', action='store_true')
 parser.add_argument('--test_100shot', action='store_true')
+parser.add_argument('--test_50shot', action='store_true')
 parser.add_argument('--prune', action='store_true')
 parser.add_argument('--prune_percent', type=float, default=0, help="whole prune percentage")
 
@@ -57,12 +56,6 @@ def main():
     eval_testset = torchvision.datasets.CIFAR100(root=args.data_folder, train=False, download=True, transform=tfs_test)
     eval_test_loader = torch.utils.data.DataLoader(eval_testset, batch_size=1000, shuffle=False, num_workers=1, pin_memory=True)
 
-    if args.test_10shot:
-        eval_train_loader_10shot_1 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split1_test_10shot.npy'))), num_workers=2)
-        eval_train_loader_10shot_2 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split2_test_10shot.npy'))), num_workers=2)
-        eval_train_loader_10shot_3 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split3_test_10shot.npy'))), num_workers=2)
-        eval_train_loader_10shot_4 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split4_test_10shot.npy'))), num_workers=2)
-        eval_train_loader_10shot_5 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split5_test_10shot.npy'))), num_workers=2)
     if args.test_50shot:
         eval_train_loader_50shot_1 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split1_test_50shot.npy'))), num_workers=2)
         eval_train_loader_50shot_2 = torch.utils.data.DataLoader(eval_train_datasets,batch_size=1000, sampler=SubsetRandomSampler(list(np.load('split/cifar100_imbSub_with_subsets/cifar100_split2_test_50shot.npy'))), num_workers=2)
@@ -87,16 +80,6 @@ def main():
     if args.test_fullshot:
         acc_full = eval(eval_train_loader_fullshot, eval_test_loader, model, epoch, args=args)
         print("Accuracy fullshot {}".format(acc_full))
-
-    if args.test_10shot:
-        acc_few_1 = eval(eval_train_loader_10shot_1, eval_test_loader, model, epoch, args=args)
-        acc_few_2 = eval(eval_train_loader_10shot_2, eval_test_loader, model, epoch, args=args)
-        acc_few_3 = eval(eval_train_loader_10shot_3, eval_test_loader, model, epoch, args=args)
-        acc_few_4 = eval(eval_train_loader_10shot_4, eval_test_loader, model, epoch, args=args)
-        acc_few_5 = eval(eval_train_loader_10shot_5, eval_test_loader, model, epoch, args=args)
-
-        acc_average = (acc_few_1[1]+acc_few_2[1]+acc_few_3[1]+acc_few_4[1]+acc_few_5[1])/5
-        print("Accuracy 10shot {},{},{},{},{}, Average {}".format(acc_few_1, acc_few_2, acc_few_3, acc_few_4, acc_few_5, acc_average))
 
     if args.test_50shot:
         acc_few_1 = eval(eval_train_loader_50shot_1, eval_test_loader, model, epoch, args=args)
