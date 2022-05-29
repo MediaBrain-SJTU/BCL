@@ -49,9 +49,11 @@ def eval(train_loader, test_loader, model, epoch, args=None):
     model.eval()
     
     if args.prune_percent > 0:
+        # sdclr, BCL-D
         projector = model.backbone.fc
         model.backbone.fc = nn.Identity()
     else:
+        # simclr, BCL-I
         projector = model.projector
         model.projector = nn.Identity()
 

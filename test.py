@@ -9,8 +9,9 @@ import numpy as np
 import torchvision
 from eval_cifar import eval
 from models.simclr import SimCLR
+from models.sdclr import SDCLR, Mask
 
-parser = argparse.ArgumentParser(description='PyTorch Cifar100LT Testing')
+parser = argparse.ArgumentParser(description='PyTorch Cifar100-LT Testing')
 parser.add_argument('--save-dir', default='', type=str, help='path to save checkpoint')
 parser.add_argument('--data_folder', default='', type=str, help='dataset path')
 parser.add_argument('--dataset', type=str, default='cifar100', help="dataset-cifar100")
@@ -19,11 +20,12 @@ parser.add_argument('--num_workers', type=int, default=8)
 parser.add_argument('--checkpoint', default='', type=str, help='saving pretrained model')
 parser.add_argument('--seed', type=int, default=10, help='random seed')
 parser.add_argument('--model', default='resnet18', type=str, help='model type')
-parser.add_argument('--test', action='store_true')
 parser.add_argument('--test_fullshot', action='store_true')
 parser.add_argument('--test_10shot', action='store_true')
 parser.add_argument('--test_50shot', action='store_true')
 parser.add_argument('--test_100shot', action='store_true')
+parser.add_argument('--prune', action='store_true')
+parser.add_argument('--prune_percent', type=float, default=0, help="whole prune percentage")
 
 
 def main():
@@ -36,7 +38,11 @@ def main():
     torch.backends.cudnn.benchmark = True
     setup_seed(args.seed)
 
-    model = SimCLR(num_class=100, network=args.model).cuda()
+    if not args.prune:
+        model = SimCLR(num_class=100, network=args.model).cuda()
+    else:
+        model = SDCLR(num_class=100, network=args.model).cuda()
+        args.prune_percent = 0.9
 
     tfs_test = transforms.Compose([
             transforms.ToTensor(),

@@ -43,9 +43,6 @@ class SimCLR(nn.Module):
                 'resnet50': resnet50}[backbone_name]
 
     def forward(self, x):
-
-        d = x.size()
-        x = x.view(d[0]*2, d[2], d[3], d[4]).cuda(non_blocking=True)
         
         x = self.backbone(x)
         x = self.projector(x)
