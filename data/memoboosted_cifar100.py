@@ -40,7 +40,8 @@ class memoboosted_CIFAR100(CIFAR100):
                 transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
                 transforms.RandomGrayscale(p=0.2),
                 # RandAugment_prob(1, 30*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
-                RandAugment_prob(self.args.rand_k, self.args.rand_strength*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
+                RandAugment_prob(1, 5+25*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
+                # RandAugment_prob(self.args.rand_k, self.args.rand_strength*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
                 transforms.ToTensor(),
             ])
 

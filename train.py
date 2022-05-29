@@ -39,6 +39,7 @@ parser.add_argument('--bcl', action='store_true', help='boosted contrastive lear
 parser.add_argument('--momentum_loss_beta', type=float, default=0.97)
 parser.add_argument('--rand_k', type=int, default=1, help='k in randaugment')
 parser.add_argument('--rand_strength', type=int, default=30, help='maximum strength in randaugment(0-30)')
+parser.add_argument('--prune_percent', type=float, default=0, help="whole prune percentage")
 
 
 def main():

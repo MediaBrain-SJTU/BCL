@@ -1,11 +1,22 @@
 # Contrastive Learning with Boosted Memorization
 
-**Official PyTorch code** for the paper "Contrastive Learning with Boosted Memorization".
+**Keywords**: Long-Tailed Recognition, Self-Supervised Learning, Memorization Effect
 
 **[Contrastive Learning with Boosted Memorization](https://arxiv.org/abs/2205.12693)**  
-Zhihan Zhou, Jiangchao Yao, Yanfeng Wang, Bo Han, Ya Zhang
 
-arXiv 2022
+ICML 2022
+
+```
+@inproceedings{
+    zhou2022boosted,
+    title={Contrastive Learning with Boosted Memorization},
+    author={Zhou, Zhihan and Yao, Jiangchao and Wang, Yanfeng and Han, Bo and Zhang, Ya},
+    booktitle={International Conference on Machine Learning},
+    year={2022},
+    organization={PMLR}
+}
+```
+
 
 <div align="left">
   <img src="figures/methods.jpg" width="1000px" />
@@ -136,21 +147,6 @@ The code will output the results of full-shot/100-shot/50-shot linear probing ev
 
 - Create long-tailed splits of the datasets and add to ./split.
 - Implement the dataset (e.g. memoboosted_cifar100.py).
-
-
-## Citation
-
-If you find our paper and repo useful, please cite as
-
-```
-@article{
-    zhou2022boostedmemo,
-    title={Contrastive Learning with Boosted Memorization},
-    author={Zhihan Zhou and Jiangchao Yao and Yanfeng Wang and Bo Han and Ya Zhang},
-    journal={arXiv:2205.12693},
-    year={2022},
-}
-```
 
 ## Acknowledgement
 
