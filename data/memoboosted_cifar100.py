@@ -34,14 +34,16 @@ class memoboosted_CIFAR100(CIFAR100):
         img = self.data[idx]
         img = Image.fromarray(img).convert('RGB')
 
+        min_strength = 10 # training stability
         memo_boosted_aug = transforms.Compose([
                 transforms.RandomResizedCrop(32, scale=(0.1, 1.0), interpolation=3),
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
                 transforms.RandomGrayscale(p=0.2),
+                # RandAugment_prob(1, 23, 0.5),
                 # RandAugment_prob(1, 30*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
-                RandAugment_prob(1, 5+25*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
-                # RandAugment_prob(self.args.rand_k, self.args.rand_strength*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
+                # RandAugment_prob(1, 10+20*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
+                RandAugment_prob(self.args.rand_k, min_strength + (self.args.rand_strength - min_strength)*self.momentum_weight[idx]*np.random.rand(1), 1.0*self.momentum_weight[idx]),
                 transforms.ToTensor(),
             ])
 

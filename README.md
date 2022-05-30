@@ -104,17 +104,17 @@ python train.py SimCLR --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5
 
 - BCL-I
 ```train BCL-I
-python train.py BCL_I --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --data_folder ${data_folder} --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
+python train.py BCL_I --bcl --rand_k 1 --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 5e-4 --data_folder ${data_folder} --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 - SDCLR
-```train SimCLR
+```train SDCLR
 python train_sdclr.py SDCLR --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --data_folder ${data_folder} --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 - BCL-D
 ```train BCL-D
-python train_sdclr.py BCL_D --bcl --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --data_folder ${data_folder} --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
+python train_sdclr.py BCL_D --bcl --rand_k 2 --lr 0.5 --epochs 2000 --temperature 0.2 --weight_decay 1e-4 --data_folder ${data_folder} --trainSplit cifar100_imbSub_with_subsets/cifar100_split1_D_i.npy 
 ```
 
 Pretrained checkpoints will be saved in 'checkpoints/'.
@@ -134,6 +134,19 @@ python test.py --checkpoint ${checkpoint_pretrain} --prune --test_fullshot --tes
 ```
 
 The code will output the results of full-shot/100-shot/50-shot linear probing evaluation.
+
+### Results and Pretrained Models
+
+We provide the full-shot/100-shot/50-shot results(demo) pretrained on 'cifar100_split1_D_i.npy' with the corresponding checkpoint weights.
+
+  | Method                 | Full-shot  | 100-shot |  50-shot    | Model  |
+  | ---------------------- |:-----:|:------:|:------: |:------:|
+  | SimCLR                 | 50.7  |  46.3  |  42.4	  | [ResNet18](https://drive.google.com/file/d/1gcVzeLDY1fCR1uUjwlrYyatByb3AP74W/view?usp=sharing)|
+  | SDCLR                  | 55.0  |  49.7	|  45.6   | [ResNet18](https://drive.google.com/file/d/1MHH8K8mmCCPL6GOwR9g0TtjSJPPouRBZ/view?usp=sharing)|
+  | BCL-I                  |   |  	|     | [ResNet18]
+  | BCL-D                  |   |    |  	  | [ResNet18]
+
+After downloading the checkpoints, you could run evaluation by the instructions in the evaluating section.
 
 ### Extensions
 
