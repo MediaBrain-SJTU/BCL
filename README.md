@@ -24,37 +24,6 @@ ICML 2022
 
 **Abstract**: Self-supervised learning has achieved a great success in the representation learning of visual and textual data. However, the current methods are mainly validated on the well-curated datasets, which do not exhibit the real-world long-tailed distribution. Recent attempts to consider self-supervised long-tailed learning are made by rebalancing in the loss perspective or the model perspective, resembling the paradigms in the supervised long-tailed learning. Nevertheless, without the aid of labels, these explorations have not shown the expected significant promise due to the limitation in tail sample discovery or the heuristic structure design. Different from previous works, we explore this direction from an alternative perspective, i.e., the data perspective, and propose a novel Boosted Contrastive Learning (BCL) method. Specifically, BCL leverages the memorization effect of deep neural networks to automatically drive the information discrepancy of the sample views in contrastive learning, which is more efficient to enhance the long-tailed learning in the label-unaware context. Extensive experiments on a range of benchmark datasets demonstrate the effectiveness of BCL over several state-of-the-art methods.
 
-
-## Quick Preview
-A code snippet of the BCL is shown below. 
-
-```python
-
-train_datasets = memoboosted_CIFAR100(train_idx_list, args, root=args.data_folder, train=True)
-
-# initialize momentum loss
-shadow = torch.zeros(dataset_total_num).cuda()
-momentum_loss = torch.zeros(args.epochs,dataset_total_num).cuda()
-
-shadow, momentum_loss = train(train_loader, model, optimizer, scheduler, epoch, log, shadow, momentum_loss, args=args)
-train_datasets.update_momentum_weight(momentum_loss, epoch)
-
-```
-
-During the training phase, track the momentum loss. 
-
-```python
-
-if epoch>1:
-    new_average = (1.0 - args.momentum_loss_beta) * loss[batch_idx].clone().detach() + args.momentum_loss_beta * shadow[index[batch_idx]]
-else:
-    new_average = loss[batch_idx].clone().detach()
-    
-shadow[index[batch_idx]] = new_average
-momentum_loss[epoch-1,index[batch_idx]] = new_average
-
-```
-
 ## Get Started
 
 ### Environment
@@ -92,6 +61,36 @@ After the preparation work, the whole project should has the following structure
 ├── train.py                        # training code
 ├── train_sdclr.py                  # training code for sdclr
 └── utils.py                        # utils
+```
+
+## Quick Preview
+A code snippet of the BCL is shown below. 
+
+```python
+
+train_datasets = memoboosted_CIFAR100(train_idx_list, args, root=args.data_folder, train=True)
+
+# initialize momentum loss
+shadow = torch.zeros(dataset_total_num).cuda()
+momentum_loss = torch.zeros(args.epochs,dataset_total_num).cuda()
+
+shadow, momentum_loss = train(train_loader, model, optimizer, scheduler, epoch, log, shadow, momentum_loss, args=args)
+train_datasets.update_momentum_weight(momentum_loss, epoch)
+
+```
+
+During the training phase, track the momentum loss. 
+
+```python
+
+if epoch>1:
+    new_average = (1.0 - args.momentum_loss_beta) * loss[batch_idx].clone().detach() + args.momentum_loss_beta * shadow[index[batch_idx]]
+else:
+    new_average = loss[batch_idx].clone().detach()
+    
+shadow[index[batch_idx]] = new_average
+momentum_loss[epoch-1,index[batch_idx]] = new_average
+
 ```
 
 ### Training
