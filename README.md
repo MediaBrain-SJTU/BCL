@@ -2,7 +2,8 @@
 
 **Keywords**: Long-Tailed Recognition, Self-Supervised Learning, Memorization Effect
 
-**[Contrastive Learning with Boosted Memorization](https://arxiv.org/abs/2205.12693)**  
+**Contrastive Learning with Boosted Memorization**  
+[[Arxiv](https://arxiv.org/abs/2205.12693)] [[Papers With Code](https://paperswithcode.com/paper/contrastive-learning-with-boosted)]
 
 ICML 2022
 
