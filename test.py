@@ -12,7 +12,7 @@ from models.simclr import SimCLR
 from models.sdclr import SDCLR, Mask
 
 parser = argparse.ArgumentParser(description='PyTorch Cifar100-LT Testing')
-parser.add_argument('--save-dir', default='', type=str, help='path to save checkpoint')
+parser.add_argument('--save_dir', default='', type=str, help='path to save checkpoint')
 parser.add_argument('--data_folder', default='', type=str, help='dataset path')
 parser.add_argument('--dataset', type=str, default='cifar100', help="dataset-cifar100")
 parser.add_argument("--gpus", type=str, default="0", help="gpu id sequence split by comma")

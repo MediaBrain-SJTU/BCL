@@ -16,7 +16,7 @@ from losses.nt_xent import NT_Xent_Loss
 
 parser = argparse.ArgumentParser(description='PyTorch Cifar100-LT Self-supervised Training')
 parser.add_argument('experiment', type=str)
-parser.add_argument('--save-dir', default='checkpoints', type=str, help='path to save checkpoint')
+parser.add_argument('--save_dir', default='checkpoints', type=str, help='path to save checkpoint')
 parser.add_argument('--data_folder', default='', type=str, help='dataset path')
 parser.add_argument('--dataset', type=str, default='cifar100', help="dataset-cifar100")
 parser.add_argument('--trainSplit', type=str, default='', help="train split")
