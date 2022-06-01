@@ -143,8 +143,8 @@ We provide the full-shot/100-shot/50-shot results(demo) pretrained on 'cifar100_
   | ---------------------- |:-----:|:------:|:------: |:------:|
   | SimCLR                 | 50.7  |  46.3  |  42.4	  | [ResNet18](https://drive.google.com/file/d/1gcVzeLDY1fCR1uUjwlrYyatByb3AP74W/view?usp=sharing)|
   | SDCLR                  | 55.0  |  49.7	|  45.6   | [ResNet18](https://drive.google.com/file/d/1MHH8K8mmCCPL6GOwR9g0TtjSJPPouRBZ/view?usp=sharing)|
-  | BCL-I                  |   |  	|     | [ResNet18]
-  | BCL-D                  |   |    |  	  | [ResNet18]
+  | BCL-I                  | 55.7  |  50.1 	|  45.8   | [ResNet18](https://drive.google.com/file/d/1rPFCJfpW7Y092niXJK6BOEyEmAwVlFAy/view?usp=sharing)
+  | BCL-D                  | 58.7  |  52.6  |  48.7	  | [ResNet18](https://drive.google.com/file/d/15wKUgG7u77mRw85fbEdsxjEsCAAunmQU/view?usp=sharing)
 
 After downloading the checkpoints, you could run evaluation by the instructions in the evaluating section.
 
