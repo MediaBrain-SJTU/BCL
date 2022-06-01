@@ -158,6 +158,7 @@ def Identity(img, v):
 
 def augment_list():  # 16 oeprations and their ranges
 
+    # Some specific settings can be referred to the discovery in Table 5, Sec 4.5.
     l = [
         # (Identity, 0., 1.0),
         (ShearX, 0., 0.6),  # 0
