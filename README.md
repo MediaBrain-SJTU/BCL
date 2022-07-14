@@ -7,12 +7,13 @@
 ICML 2022
 
 ```
-@inproceedings{
-    zhou2022boosted,
-    title={Contrastive Learning with Boosted Memorization},
-    author={Zhou, Zhihan and Yao, Jiangchao and Wang, Yanfeng and Han, Bo and Zhang, Ya},
-    booktitle={International Conference on Machine Learning},
-    year={2022}
+@inproceedings{zhou2022contrastive,
+  title={Contrastive Learning with Boosted Memorization},
+  author={Zhou, Zhihan and Yao, Jiangchao and Wang, Yan-Feng and Han, Bo and Zhang, Ya},
+  booktitle={International Conference on Machine Learning},
+  pages={27367--27377},
+  year={2022},
+  organization={PMLR}
 }
 ```
 
