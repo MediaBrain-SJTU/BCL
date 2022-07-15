@@ -35,7 +35,7 @@ ICML 2022
 
 ### File Structure
 
-After the preparation work, the whole project should has the following structure:
+After the preparation work, the whole project should have the following structure:
 
 ```
 ./Boosted-Contrastive-Learning
