@@ -62,4 +62,72 @@ def save_checkpoint(state, filename='weight.pt'):
     Save the training model
     """
     torch.save(state, filename)
+    
+def disjoint_summary(prefix, bestAcc, classWiseAcc, currentStatistics=None,
+                      noReturnAvg=False, returnValue=False, group=3, noGroup=False):
+
+    accList = []
+    fullVarianceList = []
+    GroupVarienceList = []
+    majorAccList = []
+    moderateAccList = []
+    minorAccList = []
+
+    sortIdx = np.argsort(currentStatistics)
+    idxsMajor = sortIdx[len(currentStatistics) // 3 * 2:]
+    idxsModerate = sortIdx[len(currentStatistics) // 3 * 1: len(currentStatistics) // 3 * 2]
+    idxsMinor = sortIdx[: len(currentStatistics) // 3 * 1]
+
+    classWiseAcc = np.array(classWiseAcc)
+    bestAcc = np.mean(classWiseAcc)
+    majorAcc = np.mean(classWiseAcc[idxsMajor])
+    moderateAcc = np.mean(classWiseAcc[idxsModerate])
+    minorAcc = np.mean(classWiseAcc[idxsMinor])
+
+    accList.append(bestAcc)
+    majorAccList.append(majorAcc)
+    moderateAccList.append(moderateAcc)
+    minorAccList.append(minorAcc)
+    fullVarianceList.append(np.std(classWiseAcc / 100))
+    GroupVarienceList.append(np.std(np.array([majorAcc, moderateAcc, minorAcc]) / 100))
+
+    if group > 3:
+        assert len(classWiseAcc) % group == 0
+        group_idx_list = [sortIdx[len(currentStatistics) // group * cnt: len(currentStatistics) // group * (cnt + 1)] \
+                            for cnt in range(0, group)]
+        group_accs = [np.mean(classWiseAcc[group_idx_list[cnt]]) for cnt in range(0, group)]
+        outputStr = "{}: group accs are".format(prefix)
+        for acc in group_accs:
+            outputStr += " {:.02f}".format(acc)
+        print(outputStr)
+
+    if returnValue:
+        return accList, majorAccList, moderateAccList, minorAccList, fullVarianceList, GroupVarienceList
+    else:
+        if noReturnAvg:
+            outputStr = "{}: accs are".format(prefix)
+            for acc in accList:
+                outputStr += " {:.02f}".format(acc)
+            print(outputStr)
+            if not noGroup:
+                outputStr = "{}: majorAccs are".format(prefix)
+                for acc in majorAccList:
+                    outputStr += " {:.02f}".format(acc)
+                print(outputStr)
+                outputStr = "{}: moderateAccs are".format(prefix)
+                for acc in moderateAccList:
+                    outputStr += " {:.02f}".format(acc)
+                print(outputStr)
+                outputStr = "{}: minorAccs are".format(prefix)
+                for acc in minorAccList:
+                    outputStr += " {:.02f}".format(acc)
+            print(outputStr)
+        else:
+            print("{}: acc is {:.02f}+-{:.02f}".format(prefix, np.mean(accList), np.std(accList)))
+            if not noGroup:
+                print("{}: vaiance is {:.04f}+-{:.04f}".format(prefix, np.mean(fullVarianceList), np.std(fullVarianceList)))
+                print("{}: GroupBalancenessList is {:.04f}+-{:.04f}".format(prefix, np.mean(GroupVarienceList), np.std(GroupVarienceList)))
+                print("{}: major acc is {:.02f}+-{:.02f}".format(prefix, np.mean(majorAccList), np.std(majorAccList)))
+                print("{}: moderate acc is {:.02f}+-{:.02f}".format(prefix, np.mean(moderateAccList), np.std(moderateAccList)))
+                print("{}: minor acc is {:.02f}+-{:.02f}".format(prefix, np.mean(minorAccList), np.std(minorAccList)))
 
